@@ -1,6 +1,6 @@
 # Pulse 文档
 
-📖 **在线阅读：<https://pulse-monitor.github.io/pulse-docs/>**
+📖 **在线阅读：<https://pulse-doc.pages.dev/>**
 
 这是 [Pulse](https://github.com/pulse-monitor/pulse) 的文档源码。日常查阅请直接看在线站点。
 
@@ -29,8 +29,8 @@ dev/              开发指南、协议
 
 ## 部署
 
-`base` 现在是 `'/'`，适用于部署在**域名根路径**下（Cloudflare Pages 的 `*.pages.dev`、
-或自定义域名）。
+`base` **由环境变量 `DOCS_BASE` 决定**，默认根路径。这样两处部署互不干扰 ——
+之前手改这个值，来回改错过两次（一边对了另一边就白屏）。
 
 ### Cloudflare Pages
 
@@ -47,11 +47,8 @@ dev/              开发指南、协议
 仓库里有现成的 workflow（`.github/workflows/deploy.yml`），
 在 **Settings → Pages → Source** 选 **GitHub Actions** 即可。
 
-::: warning
-GitHub Pages 默认部署在 `<用户名>.github.io/<仓库名>/` 下，是个子路径。
-这种情况要把 `.vitepress/config.mts` 里的 `base` 改成 `'/pulse-docs/'`，
-否则 CSS 和 JS 的路径少一层前缀，整站白屏。
-:::
+workflow 里已经设好了 `DOCS_BASE=/pulse-docs/` —— GitHub Pages 部署在
+`<用户名>.github.io/<仓库名>/` 这个子路径下，不带前缀的话 CSS/JS 全部 404。
 
 ## 许可
 

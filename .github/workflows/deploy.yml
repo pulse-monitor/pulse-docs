@@ -29,6 +29,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run docs:build
+        env:
+          # GitHub Pages 部署在 <user>.github.io/<repo>/ 这个子路径下。
+          # Cloudflare Pages 是根路径，不设这个变量即可
+          DOCS_BASE: /pulse-docs/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -42,16 +42,19 @@ export default defineConfig({
   title: 'Pulse',
   description: '轻量级 VPS 监控面板 —— 探针 2.3MB / 4MB 内存，非 root 运行，不接受远程指令',
   lang: 'zh-CN',
-  // ⚠️ 这个值必须和实际部署路径一致，否则 CSS/JS 全部 404、整站无样式。
+  // 部署在子路径下时所有资源都要带前缀，不一致的话 CSS/JS 全部 404、
+  // 整站变成裸 HTML。**这个值来回改错过两次**，所以改成由环境变量决定，
+  // 不再靠人记：
   //
-  //   GitHub Pages（<user>.github.io/<repo>/）→ '/pulse-docs/'
-  //   Cloudflare Pages（*.pages.dev）或自定义域名 → '/'
-  //
-  // 踩过：改成 '/' 之后 GitHub Pages 上的站点当场变成裸 HTML。
-  base: '/pulse-docs/',
+  //   Cloudflare Pages（pulse-doc.pages.dev）/ 自定义域名 → 根路径，默认值
+  //   GitHub Pages（<user>.github.io/<repo>/）→ 在 workflow 里设
+  //                                             DOCS_BASE=/pulse-docs/
+  base: process.env.DOCS_BASE || '/',
   cleanUrls: true,
   lastUpdated: true,
-  head: [['link', { rel: 'icon', type: 'image/svg+xml', href: '/pulse-docs/favicon.svg' }]],
+  head: [
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: `${process.env.DOCS_BASE || '/'}favicon.svg` }],
+  ],
 
   themeConfig: {
     logo: '/favicon.svg',
