@@ -3,11 +3,11 @@ layout: home
 
 hero:
   name: Pulse
-  text: 轻量级 VPS 监控面板
-  tagline: 探针 2.3 MB、内存 4 MB、非 root 运行、不监听端口、不接受远程指令
+  text: 看住你所有的小鸡
+  tagline: 装上就能用的 VPS 监控面板。谁掉线了、流量跑了多少、哪台快到期了 —— 一页看完。
   image:
-    src: /favicon.svg
-    alt: Pulse
+    src: /shots/home-dark.webp
+    alt: Pulse 面板界面
   actions:
     - theme: brand
       text: 快速开始
@@ -17,47 +17,59 @@ hero:
       link: https://github.com/pulse-monitor/pulse
 
 features:
-  - title: 真的轻
-    details: 探针二进制 2.3 MB、常驻内存 4 MB、80 分钟约 1 秒 CPU 时间。面板是单个静态二进制加 SQLite，不需要数据库和 Redis。
-  - title: 不接受远程指令
-    details: 探针只上报、不听命。面板即使被攻陷也不能在你的机器上跑命令 —— 协议里根本没有「执行」这类消息，CI 里有断言盯着。
-  - title: 非特权运行
-    details: 装完之后以专用用户运行，零 capabilities，不监听任何端口，systemd 加固评分 2.0。采不到的指标如实标记为不可用，不显示 0。
-  - title: 账单与流量
-    details: 价格、周期、到期提醒、剩余价值折算、多币种自动汇率；流量按计费周期统计，支持配额与超额告警。
-  - title: 地理分布
-    details: 自绘 SVG 地球，有机器的国家整块点亮。GeoIP 数据库在本地离线查询，IP 不出你的机器。
-  - title: 通知
-    details: Telegram、企业微信、Webhook、邮件。阈值可以按全局、分组、单机三层设置，越具体越优先。
+  - icon: 🪶
+    title: 轻
+    details: 探针 2.3 MB、常驻内存 4 MB。面板是单个二进制加 SQLite，不用装数据库。
+  - icon: 🔒
+    title: 不接受远程指令
+    details: 探针只上报、不听命。面板被攻陷也动不了你的机器。
+  - icon: 💰
+    title: 账单与到期
+    details: 记价格和周期，快到期了提醒你，还能算出这批机器还剩多少钱没用完。
+  - icon: 📊
+    title: 流量统计
+    details: 按计费周期算，超配额告警。探针重启、机器重装都不会丢数。
+  - icon: 🌍
+    title: 地理分布
+    details: 机器在哪个国家自动认出来，地球上整块点亮。GeoIP 库在本地，IP 不外传。
+  - icon: 🔔
+    title: 通知
+    details: Telegram、企业微信、Webhook、邮件。阈值可以按分组或单机单独设。
+  - icon: 📡
+    title: 延迟监测
+    details: 多个探测点画在同一张图上，一眼看出哪条线路慢了。
+  - icon: 🖥️
+    title: 三平台
+    details: Linux、Windows、macOS。Linux 上静态链接，不挑发行版。
 ---
 
-## 为什么又造一个轮子
+<div class="shots">
 
-现有方案（komari、哪吒）功能都不错，但对「我就想看看机器还活着吗、流量跑了多少、
-什么时候到期」这个需求来说太重了。
+## 界面
 
-| | Pulse | 常见方案 |
-|---|---|---|
-| 探针二进制 | **2.3 MB** | 15～30 MB |
-| 探针内存 | **4 MB** | 30～80 MB |
-| 探针权限 | **非 root，零 capabilities，不监听端口** | 常需 root |
-| 远程执行 / Web 终端 | **明确不做** | 有 |
-| 面板依赖 | 单个二进制 + SQLite | 需要数据库 / Redis |
+**单机详情** —— 硬件、系统、存储、网络四张信息卡，六张图表，时间范围可切到一年。
 
-最后两行是**设计约束**，不是没来得及做：
+![单机详情](/shots/detail.webp)
 
-- **不做远程执行。** 面板暴露在公网上，它被攻陷的概率远高于你的每一台 VPS。
-  如果探针听命于面板，攻陷面板就等于攻陷所有机器。
-- **单文件部署。** 50～200 台机器的规模下 SQLite 完全够用，省掉一整套数据库运维。
+**列表视图** —— 机器多了之后，一行一台扫得更快。
 
-## 数据留多久
+![列表视图](/shots/list.webp)
 
-分三层，自动上卷和清理，不用管：
+**浅色主题** —— 跟随系统，也能手动切。
 
-| 层 | 粒度 | 保留 |
-|---|---|---|
-| 内存环形缓冲 | 2 秒 | 最近若干分钟 |
-| 分钟表 | 1 分钟 | 7 天 |
-| 小时表 | 1 小时 | 13 个月 |
+![浅色主题](/shots/home-light.webp)
 
-200 台机器跑满一年，数据库约 2 GB。
+<div class="mobile-row">
+<div>
+
+**手机上也能看**
+
+不是缩小版的桌面页 —— 卡片重排成单列，地球缩到顶部，图表照常可交互。
+
+</div>
+
+![手机](/shots/mobile.webp)
+
+</div>
+
+</div>
