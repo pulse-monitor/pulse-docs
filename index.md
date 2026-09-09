@@ -5,9 +5,6 @@ hero:
   name: Pulse
   text: 看住你所有的小鸡
   tagline: 装上就能用的 VPS 监控面板。谁掉线了、流量跑了多少、哪台快到期了 —— 一页看完。
-  image:
-    src: /shots/home-dark.webp
-    alt: Pulse 面板界面
   actions:
     - theme: brand
       text: 快速开始
@@ -42,34 +39,3 @@ features:
     title: 三平台
     details: Linux、Windows、macOS。Linux 上静态链接，不挑发行版。
 ---
-
-<div class="shots">
-
-## 界面
-
-**单机详情** —— 硬件、系统、存储、网络四张信息卡，六张图表，时间范围可切到一年。
-
-![单机详情](/shots/detail.webp)
-
-**列表视图** —— 机器多了之后，一行一台扫得更快。
-
-![列表视图](/shots/list.webp)
-
-**浅色主题** —— 跟随系统，也能手动切。
-
-![浅色主题](/shots/home-light.webp)
-
-<div class="mobile-row">
-<div>
-
-**手机上也能看**
-
-不是缩小版的桌面页 —— 卡片重排成单列，地球缩到顶部，图表照常可交互。
-
-</div>
-
-![手机](/shots/mobile.webp)
-
-</div>
-
-</div>

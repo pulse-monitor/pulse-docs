@@ -1,5 +1,5 @@
-/* 首页 hero 的图默认是个 320px 的方块（给 logo 用的）。
-   我们放的是产品界面截图，得给它宽幅的位置，否则缩成一小块什么也看不清。 */
+/* hero 的图默认是个 320px 的方块（给 logo 用的）。我们放的是产品界面截图，
+   得给它宽幅的位置，否则缩成一小块什么也看不清。 */
 .VPHero .image {
   max-width: none;
   margin: 0;
@@ -13,16 +13,6 @@
 .VPHero .image-bg {
   display: none; /* 那团紫色光晕会把截图衬得发灰 */
 }
-.VPHero .image-src {
-  position: static;
-  max-width: 100%;
-  max-height: none;
-  border-radius: 10px;
-  box-shadow:
-    0 1px 2px rgb(0 0 0 / 0.06),
-    0 12px 32px -8px rgb(0 0 0 / 0.22);
-  transform: none;
-}
 
 /* 宽屏下让 hero 整体宽一点，图才放得开 */
 @media (min-width: 960px) {
@@ -30,50 +20,11 @@
     max-width: 1200px;
   }
   .VPHero .main {
-    max-width: 460px;
+    max-width: 440px;
   }
 }
-
-/* 窄屏时图放在文字下面，占满宽度 */
 @media (max-width: 959px) {
   .VPHero .image-container {
     max-width: 100%;
   }
 }
-
-/* 首页下半部分的界面截图。VitePress 的 home 布局默认没有内容区样式，
-   这里给它一个和 features 一样的宽度和留白 */
-.shots {
-  max-width: 1152px;
-  margin: 0 auto;
-  padding: 1rem 24px 4rem;
-}
-.shots h2 {
-  margin: 2rem 0 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--vp-c-divider);
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-.shots p {
-  margin: 1.75rem 0 0.75rem;
-  color: var(--vp-c-text-2);
-  line-height: 1.7;
-}
-.shots img {
-  border-radius: 10px;
-  border: 1px solid var(--vp-c-divider);
-  box-shadow: 0 8px 28px -12px rgb(0 0 0 / 0.25);
-}
-/* 手机截图窄而高，单独占一列，旁边放说明文字 */
-.shots .mobile-row {
-  display: grid;
-  gap: 2rem;
-  align-items: center;
-  grid-template-columns: 1fr;
-}
-@media (min-width: 720px) {
-  .shots .mobile-row { grid-template-columns: 1fr 280px; }
-}
-.shots .mobile-row img { max-width: 280px; }
-.shots .mobile-row p:first-child { margin-top: 0; }
