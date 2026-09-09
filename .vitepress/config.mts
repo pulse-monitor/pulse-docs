@@ -42,12 +42,14 @@ export default defineConfig({
   title: 'Pulse',
   description: '轻量级 VPS 监控面板 —— 探针 2.3MB / 4MB 内存，非 root 运行，不接受远程指令',
   lang: 'zh-CN',
-  // GitHub Pages 部署在 <user>.github.io/<repo>/ 下，所有资源都要带这个前缀。
-  // 用自定义域名时把它改回 '/'
-  base: '/pulse-docs/',
+  // 部署在域名根路径下（Cloudflare Pages 的 *.pages.dev、或自定义域名）。
+  //
+  // 如果改回 GitHub Pages 的 <user>.github.io/<repo>/ 形式，这里要改成
+  // '/pulse-docs/'，否则所有 CSS / JS 的路径都会少一层前缀、整站白屏。
+  base: '/',
   cleanUrls: true,
   lastUpdated: true,
-  head: [['link', { rel: 'icon', type: 'image/svg+xml', href: '/pulse-docs/favicon.svg' }]],
+  head: [['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }]],
 
   themeConfig: {
     logo: '/favicon.svg',
