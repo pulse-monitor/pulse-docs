@@ -27,7 +27,7 @@ PULSE_PUBLIC_URL=https://panel.example.com \
 ```yaml
 services:
   pulse:
-    image: jinqians/pulse-server:latest
+    image: ghcr.io/pulse-monitor/pulse:latest
     restart: unless-stopped
     ports: ["25774:25774"]
     volumes: ["./data:/data"]
