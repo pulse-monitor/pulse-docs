@@ -1,6 +1,6 @@
 # Pulse 文档
 
-📖 **在线阅读：<https://pulse-docs.pages.dev/>**
+📖 **在线阅读：<https://pulse-monitor.github.io/pulse-docs/>**
 
 这是 [Pulse](https://github.com/pulse-monitor/pulse) 的文档源码。日常查阅请直接看在线站点。
 
