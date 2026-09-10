@@ -10,15 +10,16 @@ import { onMounted, onUnmounted, ref } from 'vue'
  *
  * 不放手机截图 —— 它的宽高比和另外四张差太多，混在一起会让容器高度乱跳。
  *
- * 四张图的比例并不一致（1.60 / 1.44 / 1.89）。所以边框和阴影画在 <img> 上而不是
+ * 四张里有三张是 1600x1000，列表页天生矮一些（1600x824）。所以边框和阴影
+ * 画在 <img> 上而不是
  * 外层框上，配 object-fit: contain：每张都按自己的比例完整显示、不裁掉内容，
  * 外层框的高度是写死的，切换时页面不会跳。
  */
 const shots = [
   { src: '/shots/home-dark.webp', alt: 'Pulse 首页（深色）', w: 1600, h: 1000 },
   { src: '/shots/home-light.webp', alt: 'Pulse 首页（浅色）', w: 1600, h: 1000 },
-  { src: '/shots/detail.webp', alt: '单机详情：硬件、系统、六张图表', w: 1400, h: 972 },
-  { src: '/shots/list.webp', alt: '列表视图：一行一台', w: 1400, h: 739 },
+  { src: '/shots/detail.webp', alt: '单机详情：硬件、系统、六张图表', w: 1600, h: 1000 },
+  { src: '/shots/list.webp', alt: '列表视图：一行一台', w: 1600, h: 824 },
 ]
 
 const INTERVAL = 4500
