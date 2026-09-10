@@ -72,12 +72,41 @@ Agent 与 Server 之间是 WebSocket + JSON，定义在 `crates/pulse-proto`
 
 细节见 [Agent 协议](/dev/protocol)。
 
+## 镜像里的前端是哪个版本
+
+Server 镜像要把前端一起打进去（面板靠 `PULSE_WEB_DIR` 提供静态文件）。
+做法是**下 pulse-web 的 Release 产物并校验 SHA256**，版本号写死在
+`deploy/docker/Dockerfile.server` 的 `ARG PULSE_WEB_VERSION` 里。
+
+::: warning 不要改回「clone main 现场构建」
+早先就是 `git clone --depth 1 --branch main` 然后 `npm run build`，
+有两个毛病，都真踩过：
+
+1. **镜像里是哪个版本的前端，取决于「构建那一刻 main 长什么样」** ——
+   事后无从查证，也没法复现某个历史镜像。
+2. **buildx 的层缓存会骗人**。clone 那一层的缓存键只看命令文本，而
+   `--branch main` 这条命令文本从不变化，于是 main 往前走了它照样命中缓存，
+   新提交根本进不了镜像。实测：修复提交比镜像构建早 16 分钟，
+   镜像里却还是旧代码 —— 而且从构建日志上完全看不出异常。
+
+现在改版本必须显式改 Dockerfile 里那一行，缓存也骗不了人。
+:::
+
+**发前端新版的流程**：
+
+```text
+1. pulse-web 打 tag → Release workflow 发出 dist.tar.gz + SHA256SUMS
+2. 改 pulse 仓库 Dockerfile.server 里的 ARG PULSE_WEB_VERSION
+3. pulse 打 tag → 镜像带上新前端
+```
+
 ## CI 里的几道守卫
 
 | 仓库 | 脚本 | 拦什么 |
 |---|---|---|
 | pulse-agent | `tools/check-agent-hardening.sh` | Agent 不提权、不接受远程指令 —— 设计约束里机器可检的部分 |
 | pulse | `tools/check-migrations.sh` | 已发布的迁移文件一个字节都不许改 |
+| pulse / pulse-agent | `cargo metadata --locked` | Cargo.lock 必须已是最新。镜像构建用 `--locked`，而 clippy/test 不用 —— 改了版本号忘了同步 lock 时，CI 全绿而 Docker 单独挂掉，还要等十几分钟才看得到（踩过两次） |
 | pulse | `tools/check-deps.sh` | 安全公告、许可证，以及「被忽略项的前提是否仍然成立」 |
 | pulse-web | `scripts/check-dist.mjs` | 前端产物里的国旗数量、地图数据、垃圾文件 |
 | 全部 | `actionlint` | workflow 文件本身。语法错误不会让某个 job 变红，而是整个 workflow 不启动 |
