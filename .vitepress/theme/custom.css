@@ -17,10 +17,22 @@
 /* 宽屏下让 hero 整体宽一点，图才放得开 */
 @media (min-width: 960px) {
   .VPHero .container {
-    max-width: 1200px;
+    max-width: 1280px;
   }
+  /* 主标题是 11 个汉字。VitePress 默认字号 56px 需要约 620px 宽，
+     一放不下就把最后一个「施」孤零零挤到第二行 —— 中文没有词边界，
+     断行位置完全不可控，所以宁可缩字号也要保证单行。
+     600px ÷ 11 字 = 54px 的余量，48px 装得下。 */
   .VPHero .main {
-    max-width: 440px;
+    max-width: 600px;
+  }
+  .VPHero .text {
+    font-size: 48px;
+    line-height: 1.25;
+    white-space: nowrap;
+  }
+  .VPHero .image-container {
+    max-width: 580px;
   }
 }
 @media (max-width: 959px) {
