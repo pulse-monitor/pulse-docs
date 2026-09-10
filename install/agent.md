@@ -114,12 +114,53 @@ flannel* zt* wg* utun* awdl* llw* bridge* vmnet* gif* stf*
 装完之后：
 
 - 以非特权用户 `pulse` 运行
-- 零 capabilities （`getpcaps` 输出为空）
+- 零 capabilities（`getpcaps` 输出为空）
 - 不监听任何端口
 - systemd 加固评分约 2.0
 
 **非 root 采不到的东西会如实标记为「不可用」，而不是显示 0。** 比如某些机器上的
 CPU 温度需要额外权限，那一项就整块不显示 —— 显示 0°C 是撒谎。
+
+#### Alpine / OpenRC
+
+安装脚本认得 OpenRC，装法和上面一样，不用改命令。装完会写
+`/etc/init.d/pulse-agent`，用 `supervise-daemon` 托管（等价于 systemd 的
+`Restart=always`）。
+
+```sh
+rc-service pulse-agent status
+tail -f /var/log/pulse-agent.log
+```
+
+::: warning OpenRC 给不了 systemd 那套沙箱
+`ProtectSystem`、`SystemCallFilter`、`CapabilityBoundingSet`、`PrivateTmp`
+这些都是 **systemd 特有的**，OpenRC 没有等价物。
+
+Alpine 上仍然成立的是最要紧的那几条，实测确认过：
+
+| | |
+|---|---|
+| 运行身份 | `pulse`，非 root |
+| capabilities | `0000000000000000`（全零） |
+| 监听端口 | 无 |
+| 配置文件 | `0600` |
+| 用户 shell | `/sbin/nologin` |
+
+其余的命名空间与系统调用限制在 OpenRC 下拿不到。要完整的沙箱就用
+systemd 的发行版。
+:::
+
+::: tip Alpine 上用 Docker 装的话
+Alpine 默认不带 Docker，装完还要手动启用（它用 OpenRC，不会自动起）：
+
+```sh
+apk add docker docker-cli-compose
+rc-update add docker default
+service docker start
+```
+
+不然会看到 `Cannot connect to the Docker daemon at unix:///var/run/docker.sock`。
+:::
 
 ### Windows
 
