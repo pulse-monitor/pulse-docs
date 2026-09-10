@@ -10,14 +10,29 @@
 curl -fsSL https://github.com/pulse-monitor/pulse/releases/latest/download/pulse-server-x86_64-unknown-linux-musl \
   -o pulse-server && chmod +x pulse-server
 
-PULSE_ADMIN_PASSWORD='换成你自己的密码' \
 PULSE_BIND=0.0.0.0:25774 \
 PULSE_PUBLIC_URL=https://panel.example.com \
 ./pulse-server
 ```
 
-首次启动会创建管理员 `admin`。**没设 `PULSE_ADMIN_PASSWORD` 时会随机生成一个并打进日志**，
-从日志里取。
+面板还需要前端的静态文件，从 [pulse-web 的 Release](https://github.com/pulse-monitor/pulse-web/releases/latest)
+下一份，用 `PULSE_WEB_DIR` 指过去：
+
+```bash
+curl -fsSL https://github.com/pulse-monitor/pulse-web/releases/latest/download/pulse-web-dist.tar.gz \
+  | tar xz
+PULSE_WEB_DIR=./dist ./pulse-server
+```
+
+::: tip 装完立刻去设置管理员
+面板起来后打开它，**第一个访问的人设定自己的用户名和密码**。安装时不带密码参数，
+也不用去日志里翻。
+
+代价说清楚：在你设置完成之前，任何能打开这个地址的人都可以抢先创建管理员。
+所以装完请**立刻**去设置。无人值守部署不能接受这个窗口的话，用
+`PULSE_ADMIN_PASSWORD`（可配 `PULSE_ADMIN_USERNAME`）预先建好，
+那样初始化接口从一开始就是关的。
+:::
 
 `PULSE_PUBLIC_URL` 是面板的对外地址，**生成安装命令时会写进去**。装在别的机器上时必须设对，
 否则探针连不上。
@@ -36,7 +51,6 @@ services:
       PULSE_DATA_DIR: /data
       PULSE_DATABASE_URL: sqlite:///data/pulse.db
       PULSE_PUBLIC_URL: https://panel.example.com
-      PULSE_ADMIN_PASSWORD: 换成你自己的密码
 ```
 
 ### 做成系统服务

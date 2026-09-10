@@ -26,7 +26,6 @@ services:
       PULSE_DATA_DIR: /data
       PULSE_DATABASE_URL: sqlite:///data/pulse.db
       PULSE_PUBLIC_URL: https://panel.example.com
-      PULSE_ADMIN_PASSWORD: 换成你自己的密码
       PULSE_TIMEZONE: Asia/Shanghai
 ```
 
@@ -42,7 +41,6 @@ docker run -d --name pulse --restart unless-stopped \
   -p 25774:25774 \
   -v "$PWD/data:/data" \
   -e PULSE_PUBLIC_URL=https://panel.example.com \
-  -e PULSE_ADMIN_PASSWORD='换成你自己的密码' \
   ghcr.io/pulse-monitor/pulse:latest
 ```
 

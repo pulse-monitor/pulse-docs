@@ -34,13 +34,16 @@ curl -fsSL https://raw.githubusercontent.com/pulse-monitor/pulse/main/deploy/scr
 curl -fsSL https://github.com/pulse-monitor/pulse/releases/latest/download/pulse-server-x86_64-unknown-linux-musl \
   -o pulse-server && chmod +x pulse-server
 
-PULSE_ADMIN_PASSWORD='换成你自己的密码' \
 PULSE_BIND=0.0.0.0:25774 \
 PULSE_PUBLIC_URL=https://panel.example.com \
 ./pulse-server
 ```
 
-首次启动会创建管理员 `admin`。**没设 `PULSE_ADMIN_PASSWORD` 时会随机生成一个并打进日志**。
+首次启动**不建任何管理员**：打开面板，第一个访问的人自行设定用户名和密码。
+
+在设置完成之前，任何能访问该地址的人都能抢先创建管理员 —— 所以装完请立刻去设置。
+无人值守部署可用 `PULSE_ADMIN_PASSWORD`（可配 `PULSE_ADMIN_USERNAME`）预先建好，
+那样初始化接口从一开始就是关的。
 
 前端静态文件从 release 里的 `web-dist.tar.gz` 取，解开后用 `PULSE_WEB_DIR` 指过去。
 

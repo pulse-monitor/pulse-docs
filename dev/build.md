@@ -8,16 +8,43 @@
 | Node.js | 20+ | 前端构建 |
 | zig | 0.13+ | 可选，跨平台构建用（见下） |
 
-## 目录结构
+## 四个仓库
+
+| 仓库 | 内容 |
+|---|---|
+| [pulse](https://github.com/pulse-monitor/pulse) | 面板 + 协议定义 |
+| [pulse-web](https://github.com/pulse-monitor/pulse-web) | 前端（React + Vite） |
+| [pulse-agent](https://github.com/pulse-monitor/pulse-agent) | 探针：采集、上报、自更新 |
+| [pulse-docs](https://github.com/pulse-monitor/pulse-docs) | 这份文档 |
+
+三处跨仓库的接缝，改动时要留意：
+
+**协议**（`pulse-proto`）在面板仓库里 —— 它是 server 与 agent 之间的契约，由 server
+那边定版。探针按 tag 引用它，所以**改协议要记得给 proto 打新 tag**（面板发版时
+Release workflow 会自动打）。本地联调时用 patch 指向本地 checkout：
+
+```toml
+# pulse-agent/.cargo/config.toml
+[patch."https://github.com/pulse-monitor/pulse"]
+pulse-proto = { path = "../pulse/crates/pulse-proto" }
+```
+
+**前端产物**由面板通过 `PULSE_WEB_DIR` 提供。面板的安装脚本从 pulse-web 的 Release
+下 `pulse-web-dist.tar.gz`；Docker 镜像则按 ref 克隆 pulse-web 现场构建，
+这样镜像构建和前端发版不必互相等。
+
+**探针的安装脚本**（`deploy/scripts/install.sh`）留在**面板**仓库：它被 `include_str!`
+编译进面板、由 `GET /install.sh` 提供，命令行参数也是面板生成的，跟面板的耦合比跟
+探针更紧。它下载的探针二进制指向 pulse-agent 的 Release。
+
+### 面板仓库结构
 
 ```
 crates/
-  pulse-proto/     探针与面板之间的协议定义（两边共用）
-  pulse-agent/     探针：采集、上报、自更新
+  pulse-proto/     协议定义（探针按 tag 引用）
   pulse-server/    面板：API、存储、业务规则、通知
   pulse-loadgen/   压测工具，造假数据用
-web/               前端（React + Vite）
-deploy/            安装脚本、systemd unit、Docker
+deploy/            安装脚本、Docker
 tools/             CI 用的各种检查脚本
 ```
 
@@ -36,13 +63,25 @@ state.rs    内存中的实时状态（环形缓冲、在线判定）
 
 ## 构建
 
+三个仓库各自独立构建：
+
 ```bash
-cargo build --release          # 面板 + 探针
-cd web && npm install && npm run build
+# 面板
+cd pulse       && cargo build --release
+# 探针
+cd pulse-agent && cargo build --release
+# 前端
+cd pulse-web   && npm install && npm run build
 ```
 
 前端构建会先跑 `prebuild`：从 `node_modules` 里拷国旗 SVG、生成地球用的国家多边形。
 这两样是**生成物，不入库**。
+
+本地跑面板时把前端指过去：
+
+```bash
+PULSE_WEB_DIR=../pulse-web/dist cargo run -p pulse-server
+```
 
 ### 跨平台
 
@@ -62,7 +101,7 @@ cargo zigbuild --release --target aarch64-unknown-linux-musl
 
 ```bash
 cargo test --workspace        # Rust
-cd web && npm test            # 前端
+cd pulse-web && npm test      # 前端
 ```
 
 跑得快是有意的（全套约十几秒），这样才会真去跑。慢的东西（真机安装、浏览器渲染）

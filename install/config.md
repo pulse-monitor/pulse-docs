@@ -12,7 +12,8 @@
 | `PULSE_DATABASE_URL` | `sqlite://data/pulse.db` | 数据库位置，也支持 `postgres://` |
 | `PULSE_DATA_DIR` | `data` | 数据目录（GeoIP 缓存、服务端密钥） |
 | `PULSE_WEB_DIR` | `web/dist` | 前端静态文件目录 |
-| `PULSE_ADMIN_PASSWORD` | 随机 | 首次启动创建管理员用，≥8 位 |
+| `PULSE_ADMIN_PASSWORD` | 空 | **可选**。设了就在首次启动时建好管理员，初始化页面随之关闭；不设则由第一个访问面板的人自行设定 |
+| `PULSE_ADMIN_USERNAME` | `admin` | 仅在设了 `PULSE_ADMIN_PASSWORD` 时有意义 |
 | `PULSE_TLS_CERT` / `PULSE_TLS_KEY` | 空 | 配上就直接跑 HTTPS，两个必须同时给 |
 | `PULSE_TRUSTED_PROXY_HOPS` | `0` | 放在反代后面时设成代理层数 |
 | `PULSE_PUBLIC_MODE` | `public` | 设成 `private` 则公开页需要登录 |

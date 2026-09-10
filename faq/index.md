@@ -65,7 +65,7 @@ macOS 上装成用户级 launchd agent，不需要 root。
 停掉面板，用环境变量重设：
 
 ```bash
-PULSE_ADMIN_PASSWORD='新密码' ./pulse-server
+PULSE_ADMIN_PASSWORD='新密码' ./pulse-server   # 库里已有管理员时不生效，需先删掉旧记录
 ```
 
 只在管理员不存在时生效。已存在的话，直接改数据库里的 `admins` 表。
