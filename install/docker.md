@@ -53,7 +53,7 @@ docker run -d --name pulse --restart unless-stopped \
 
 ## 反代后面
 
-面板在容器里监听 `0.0.0.0:25774`，宿主机上用 nginx / Caddy 转发即可。
+Server 在容器里监听 `0.0.0.0:25774`，宿主机上用 nginx / Caddy 转发即可。
 记得设 `PULSE_TRUSTED_PROXY_HOPS`，否则拿到的客户端 IP 是反代的。
 
 ## 升级

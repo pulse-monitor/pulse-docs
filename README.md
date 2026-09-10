@@ -1,55 +1,40 @@
 # Pulse 文档
 
-📖 **在线阅读：<https://pulse-doc.pages.dev/>**
+[Pulse](https://github.com/pulse-monitor/pulse) 的官方文档。
 
-这是 [Pulse](https://github.com/pulse-monitor/pulse) 的文档源码。日常查阅请直接看在线站点。
+**在线阅读：<https://pulse-doc.pages.dev/>**
 
----
+VitePress 构建，部署在 Cloudflare Pages，推到 `main` 自动发布。
 
-## 本地预览
+## 本地开发
 
 ```bash
 npm install
-npm run docs:dev      # 热更新预览，改完立刻能看到
-npm run docs:build    # 构建到 .vitepress/dist
-npm run docs:preview  # 预览构建产物
+npm run docs:dev       # 起本地预览
+npm run docs:build     # 构建到 .vitepress/dist
+npm run docs:preview   # 预览构建产物
 ```
 
-## 目录
+## 写作约定
 
-```
-index.md          首页
-install/          安装与配置
-faq/              使用与常见问题
-dev/              开发指南、协议
-.vitepress/       配置（导航栏、侧边栏）
-```
+见 [REFERENCE.md](REFERENCE.md)。核心几条：
 
-加页面要同时在 `.vitepress/config.mts` 的 `zhSidebar` 里登记，否则侧边栏看不到它。
+- 产品定位是**基础设施可视化平台**，不是「VPS 监控面板」
+- 正式术语用 **Agent** / **Server** / **遥测数据**
+- 核心表达：**一眼，看见你的基础设施。** / **看见，而不是控制。**
+- 语气克制、技术化，不用「全能」「终极」「一站式」这类词
 
-## 部署
+还有一条硬要求：**文档里的命令、参数名、默认值必须与当前源码一致**。
+写之前去仓库里核一遍，不要照抄旧版本或凭印象写。
 
-`base` **由环境变量 `DOCS_BASE` 决定**，默认根路径。这样两处部署互不干扰 ——
-之前手改这个值，来回改错过两次（一边对了另一边就白屏）。
+## 相关仓库
 
-### Cloudflare Pages
-
-在控制台新建项目连上这个仓库：
-
-| 项 | 值 |
+| 仓库 | 内容 |
 |---|---|
-| 构建命令 | `npm run docs:build` |
-| 输出目录 | `.vitepress/dist` |
-| Node 版本 | `22` |
-
-### GitHub Pages
-
-仓库里有现成的 workflow（`.github/workflows/deploy.yml`），
-在 **Settings → Pages → Source** 选 **GitHub Actions** 即可。
-
-workflow 里已经设好了 `DOCS_BASE=/pulse-docs/` —— GitHub Pages 部署在
-`<用户名>.github.io/<仓库名>/` 这个子路径下，不带前缀的话 CSS/JS 全部 404。
+| [pulse](https://github.com/pulse-monitor/pulse) | Server + 协议定义 |
+| [pulse-web](https://github.com/pulse-monitor/pulse-web) | Web 前端 |
+| [pulse-agent](https://github.com/pulse-monitor/pulse-agent) | Agent |
 
 ## 许可
 
-文档与代码同为 MIT。
+[MIT](LICENSE)

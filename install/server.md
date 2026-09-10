@@ -1,6 +1,6 @@
-# 面板部署
+# Server 部署
 
-面板是**单个静态二进制**，不需要数据库、不需要运行时。三种装法，任选其一。
+Server 是**单个静态二进制**，不需要数据库、不需要运行时。三种装法，任选其一。
 
 ## 一键脚本（推荐）
 
@@ -13,15 +13,15 @@ curl -fsSL https://raw.githubusercontent.com/pulse-monitor/pulse/main/deploy/scr
 → 起服务 → 打印随机生成的管理员密码。
 
 ::: warning `--url` 装在公网上必须给
-它是**生成探针安装命令时写进去的地址**。不给的话脚本会按本机公网 IP 猜一个，
-用域名的话探针会连不上。
+它是**生成 Agent 安装命令时写进去的地址**。不给的话脚本会按本机公网 IP 猜一个，
+用域名的话 Agent 会连不上。
 :::
 
 ### 参数
 
 | 参数 | 默认 | 说明 |
 |---|---|---|
-| `--url` | 按公网 IP 猜 | 面板对外地址 |
+| `--url` | 按公网 IP 猜 | Server 对外地址 |
 | `--bind` | `0.0.0.0:25774` | 监听地址 |
 | `--dir` | `/opt/pulse` | 安装目录 |
 | `--version` | 最新 | 指定版本 |
@@ -53,12 +53,12 @@ PULSE_PUBLIC_URL=https://panel.example.com \
 
 ## 一定要走 HTTPS
 
-::: danger 探针的 token 放在 WebSocket 握手头里
+::: danger Agent 的 token 放在 WebSocket 握手头里
 走明文 `ws://` 的话，链路上任何一跳都能拿到它 —— 拿到就能冒充这台机器上报数据。
-面板启动时会检查，`PULSE_PUBLIC_URL` 是公网明文地址就打一条 WARN。
+Server 启动时会检查，`PULSE_PUBLIC_URL` 是公网明文地址就打一条 WARN。
 :::
 
-### 甲：面板自己跑 HTTPS
+### 甲：Server 自己跑 HTTPS
 
 ```bash
 PULSE_PUBLIC_URL=https://panel.example.com \
@@ -68,7 +68,7 @@ PULSE_TLS_KEY=/etc/pulse/tls/privkey.pem \
 ```
 
 两个变量**必须同时给**，只给一个会直接启动失败 —— 「以为开了 TLS 其实没开」比起不来危险得多。
-证书续期后要重启面板才会加载新的。
+证书续期后要重启 Server才会加载新的。
 
 ### 乙：放在 nginx / Caddy 后面
 

@@ -1,4 +1,4 @@
-# 安装选项
+# Agent 安装选项
 
 安装脚本 `install.sh` 的完整参数。所有参数都可以在后台的「安装命令」对话框里勾选，
 生成好的命令直接贴到机器上即可。
@@ -7,7 +7,7 @@
 
 | 参数 | 默认 | 说明 |
 |---|---|---|
-| `--server` | 必填 | 面板地址，`wss://panel.example.com` |
+| `--server` | 必填 | Server 地址，`wss://panel.example.com` |
 | `--token` | 必填 | 该机器的凭据，后台生成 |
 | `--install-dir` | `/opt/pulse-agent` | 安装目录 |
 | `--interval` | `2` | 上报间隔（秒） |
@@ -17,11 +17,11 @@
 | `--disable-auto-update` | 关 | 关掉自更新，面板会显示「可升级」由你手动升 |
 | `--download-base` | 官方源 | 自建镜像源时用 |
 | `--update-base` | 空 | 自更新的下载源，不设则自更新不可用 |
-| `--ca-cert` | 空 | 额外信任的 CA 证书（面板用私有 CA / 自签证书时） |
+| `--ca-cert` | 空 | 额外信任的 CA 证书（Server 用私有 CA / 自签证书时） |
 | `--uninstall` | — | 卸载 |
 
 > `--download-base` 和 `--update-base` **必须是命令行参数，不能只靠环境变量** ——
-> 安装命令是 `curl … | sudo bash` 的形式，`sudo` 默认会清掉环境变量。
+> 安装命令是 `curl… | sudo bash` 的形式，`sudo` 默认会清掉环境变量。
 
 ## 网卡过滤
 
@@ -43,7 +43,7 @@ flannel* zt* wg* utun* awdl* llw* bridge* vmnet* gif* stf*
 装完之后：
 
 - 以非特权用户 `pulse` 运行
-- 零 capabilities（`getpcaps` 输出为空）
+- 零 capabilities （`getpcaps` 输出为空）
 - 不监听任何端口
 - systemd 加固评分约 2.0
 
@@ -70,13 +70,13 @@ curl -fsSL https://panel.example.com/install.sh | bash -s -- \
 
 ## 自更新
 
-探针可以自己升级，但有 5 道防线：
+Agent 可以自己升级，但有 5 道防线：
 
-1. **下载源只从本地配置读** —— 面板影响不了它。面板即使被攻陷也指不了源
+1. **下载源只从本地配置读** —— Server 影响不了它。Server 即使被攻陷也指不了源
 2. **签名校验** —— minisign 公钥内置在二进制里
 3. **摘要比对** —— 下载完先对 SHA-256
 4. **拒绝降级** —— 版本号必须更高
-5. **试用期回滚** —— 新版本起来后要在限定时间内成功连上面板并上报，否则自动回退到旧版本
+5. **试用期回滚** —— 新版本起来后要在限定时间内成功连上 Server并上报，否则自动回退到旧版本
 
 不配 `--update-base` 就整个关掉，面板会如实显示「需手动升级」。
 
@@ -86,5 +86,5 @@ curl -fsSL https://panel.example.com/install.sh | bash -s -- \
 sh install.sh --uninstall
 ```
 
-会停服务、删 unit、删二进制和配置，**不动面板上的历史数据**。要一并清掉的话，
+会停服务、删 unit、删二进制和配置，**不动 Server 上的历史数据**。要一并清掉的话，
 在后台把这台机器删掉。
