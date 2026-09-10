@@ -13,7 +13,7 @@
 | `--interval` | `2` | 上报间隔（秒） |
 | `--net-include` | 空 | 只统计这些网卡（逗号分隔，支持 `eth*` 通配） |
 | `--net-exclude` | 内置黑名单 | 排除这些网卡 |
-| `--enable-gpu` | 关 | 采集 GPU 使用率（需要 `nvidia-smi`） |
+| `--enable-gpu` | 关 | 采集 GPU 使用率。**官方发布的二进制用不了，见下** |
 | `--disable-auto-update` | 关 | 关掉自更新，面板会显示「可升级」由你手动升 |
 | `--download-base` | 官方源 | 自建镜像源时用 |
 | `--update-base` | 空 | 自更新的下载源，不设则自更新不可用 |
@@ -22,6 +22,77 @@
 
 > `--download-base` 和 `--update-base` **必须是命令行参数，不能只靠环境变量** ——
 > 安装命令是 `curl… | sudo bash` 的形式，`sudo` 默认会清掉环境变量。
+
+::: warning 这些参数是给安装脚本的，不是给 Agent 二进制的
+Agent 本身**一个命令行参数都不接受**，配置全走环境变量
+（`PULSE_SERVER`、`PULSE_TOKEN`、`PULSE_AUTO_UPDATE`、`PULSE_UPDATE_BASE`、
+`PULSE_CA_CERT`）。安装脚本会把上面的参数翻译成 systemd unit 里的环境变量。
+
+手动运行时给了参数会**直接报错**，不会被静默忽略 —— 否则它会连去默认的
+`ws://127.0.0.1:25774` 然后一直 401，日志里完全看不出参数没生效。
+
+token 之所以不做成参数：命令行对同机任何用户都能通过 `ps` 看到。
+:::
+
+## GPU
+
+**官方发布的二进制采不了 GPU。** `capabilities.gpu_nvml` 会如实报 `false`，
+面板上那一行直接隐藏。
+
+原因是这样：Agent 按 R18 的要求**绝不调用 `nvidia-smi` 子进程**，而是动态加载
+NVML 库（`libnvidia-ml.so.1`）。但官方二进制是 **musl 静态链接**的 ——
+静态链接的程序没法 `dlopen`，所以这条路在发布版里走不通。
+
+要用的话得自己编一个动态链接的版本：
+
+```bash
+git clone https://github.com/pulse-monitor/pulse-agent
+cd pulse-agent
+cargo build --release --features gpu --target x86_64-unknown-linux-gnu
+```
+
+这样构出来的二进制在**有** NVIDIA 驱动的机器上会自动认出 GPU，
+没有驱动时静默降级、如实报 `false`，不会出错。
+
+代价是它依赖宿主机的 glibc，不像 musl 静态版那样「一个文件到处跑」。
+
+## 用 Docker 装
+
+后台的「安装命令」对话框里也有 Docker 和 Compose 两种写法，直接复制即可。
+形如：
+
+```bash
+docker run -d --name pulse-agent --restart=always \
+  --network host \
+  --pid host \
+  -v /:/rootfs:ro,rslave \
+  -e PULSE_SERVER=wss://panel.example.com \
+  -e PULSE_TOKEN=<TOKEN> \
+  -e PULSE_ROOTFS=/rootfs \
+  ghcr.io/pulse-monitor/pulse-agent:latest
+```
+
+三个参数各自的作用，去掉哪个会丢什么：
+
+| 参数 | 去掉的后果 |
+|---|---|
+| `--network host` | 采到的是容器的网卡，不是宿主机的 |
+| `--pid host` | 进程数只能看到容器里的那一两个 |
+| `-v /:/rootfs:ro,rslave` + `PULSE_ROOTFS` | 磁盘用量是容器层的，不是宿主机的 |
+
+::: tip 不需要 --privileged
+只读挂载就够。镜像基于 `scratch`，**里面没有 shell** ——
+连 `docker exec` 进去都做不到。以 uid 65532 运行。
+:::
+
+镜像同时发在两处，任选：
+
+```text
+ghcr.io/pulse-monitor/pulse-agent:latest   # 公开镜像，无拉取限额
+jinqians/pulse-agent:latest                # Docker Hub 镜像
+```
+
+支持 `linux/amd64` 和 `linux/arm64`。
 
 ## 网卡过滤
 

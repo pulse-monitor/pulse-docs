@@ -93,6 +93,13 @@ location / {
 }
 ```
 
+### 丙：Cloudflare Tunnel
+
+不用在 VPS 上开任何入站端口 —— cloudflared 主动外连，流量从隧道回来。
+Pulse 只监听 `127.0.0.1`，整台机器可以对公网完全关闭。
+配置见[配置 · Cloudflare Tunnel](/install/config#cloudflare-tunnel-cloudflared)。
+
 ::: warning 配了反代一定要设 `PULSE_TRUSTED_PROXY_HOPS`
 不设的话，登录限流和访客标签看到的都是反代自己的 IP。默认 0 是「直连部署」的正确取值。
+一层 nginx / Caddy 或 Cloudflare Tunnel 直连都是 `1`，[该设几看这里](/install/config#这个值该设几)。
 :::

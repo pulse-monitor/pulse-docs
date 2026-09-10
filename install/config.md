@@ -59,6 +59,72 @@ location / {
 配了反代**一定要设 `PULSE_TRUSTED_PROXY_HOPS`**，否则登录限流和访客标签
 看到的都是反代自己的 IP。默认 0 是「直连部署」的正确取值。
 
+### 这个值该设几
+
+Pulse 取 `X-Forwarded-For` 里**倒数第 `hops` 个**地址。所以它等于
+「你自己控制的、会往 XFF 里追加内容的代理层数」：
+
+| 部署形态 | 值 |
+|---|---|
+| 直接暴露端口 | `0`（默认） |
+| 一层 nginx / Caddy | `1` |
+| Cloudflare Tunnel 直连 Pulse | `1` |
+| Cloudflare → 你的 nginx → Pulse | `2` |
+
+设小了会拿到内网代理的 IP，设大了会越过客户端拿到不存在的条目而回落成
+对端地址。装好后打开面板，页脚的访客标签显示的就是 Pulse 认定的客户端 IP ——
+和你自己的公网 IP 对一下就知道设对没有。
+
+## Cloudflare Tunnel（cloudflared）
+
+用 Cloudflare Tunnel 的话，**VPS 上一个入站端口都不用开** —— cloudflared
+主动向 Cloudflare 建立出站连接，流量从那条隧道回来。这和 Pulse 自己的
+连接方向是一致的（Agent 也是主动外连），整台机器可以对公网完全关闭。
+
+Pulse 只监听本地：
+
+```bash
+PULSE_BIND=127.0.0.1:25774
+PULSE_PUBLIC_URL=https://pulse.example.com   # 隧道的域名
+PULSE_TRUSTED_PROXY_HOPS=1
+```
+
+隧道配置：
+
+```yaml
+# ~/.cloudflared/config.yml
+tunnel: <TUNNEL-ID>
+credentials-file: /root/.cloudflared/<TUNNEL-ID>.json
+
+ingress:
+  - hostname: pulse.example.com
+    service: http://127.0.0.1:25774
+  - service: http_status:404
+```
+
+```bash
+cloudflared tunnel login
+cloudflared tunnel create pulse
+cloudflared tunnel route dns pulse pulse.example.com
+cloudflared service install       # 装成 systemd 服务
+```
+
+Agent 那边用 `wss://pulse.example.com` —— 域名和普通反代没有区别。
+
+::: warning WebSocket 与空闲超时
+Agent 走的是 WebSocket 长连接。Cloudflare 支持 WebSocket，但**空闲连接会被
+断开**。Pulse 的 Agent 默认每几秒就上报一次，正常情况下不会空闲到被断；
+真断了也只是按退避重连，不会丢累计数据（见[流量](/usage/traffic)）。
+
+如果日志里频繁出现重连，把上报间隔调小一些。
+:::
+
+::: tip 为什么不是 CF-Connecting-IP
+Cloudflare 会同时给 `CF-Connecting-IP` 和 `X-Forwarded-For`，Pulse 只读后者。
+少一个「需要信任的请求头」就少一处可被伪造的入口 —— XFF 配合 hops
+已经能拿到正确的客户端 IP（上面的表格实测过）。
+:::
+
 ## 自签证书 / 私有 CA
 
 内网部署或域名还没备案时可以用。 Agent 默认只信任内置的公共 CA 列表，

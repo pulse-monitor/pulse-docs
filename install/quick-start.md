@@ -101,7 +101,10 @@ PULSE_TLS_KEY=/etc/pulse/tls/privkey.pem \
 - 证书用 certbot / acme.sh 签好即可
 - **续期后要重启 Server**才会加载新证书
 
-### 乙：放在 nginx / Caddy 后面
+### 乙：放在 nginx / Caddy 后面 —— 或者 Cloudflare Tunnel
+
+用 [Cloudflare Tunnel](/install/config#cloudflare-tunnel-cloudflared) 的话，
+VPS 上**一个入站端口都不用开**。
 
 ```bash
 PULSE_BIND=127.0.0.1:25774 \
@@ -111,6 +114,8 @@ PULSE_TRUSTED_PROXY_HOPS=1 \
 ```
 
 - **`PULSE_TRUSTED_PROXY_HOPS` 不设的话，登录限流和访客标签看到的都是反代的 IP**
+  （一层 nginx / Caddy 或 Cloudflare Tunnel 直连都是 `1`，
+  [该设几看这里](/install/config#这个值该设几)）
 - Agent 连的是 WebSocket，代理必须放行 `Upgrade` / `Connection` 头。 Caddy 默认就行；
   nginx 要写 `proxy_set_header Upgrade $http_upgrade; proxy_set_header Connection "upgrade";`
 - WebSocket 是长连接，`proxy_read_timeout` 要调大（比如 `3600s`），否则 Agent 每分钟被踢一次
